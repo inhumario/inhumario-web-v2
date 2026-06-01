@@ -33,15 +33,15 @@
                 <strong>Agentes de voz IA</strong>
                 <span>Atiende tu teléfono 24/7 con voz natural</span>
               </a>
-              <a href="https://alicia.inhumario.com/" role="menuitem">
+              <a href="https://easyfactu.inhumario.com/" role="menuitem">
                 <strong>EasyFactu</strong>
                 <span>Adiós a Excel: facturación con IA</span>
               </a>
-              <a href="${link('/#soluciones')}" role="menuitem">
+              <a href="https://amazon.inhumario.com/" role="menuitem">
                 <strong>Gestión de Amazon</strong>
                 <span>Listings y operativa Amazon automatizadas</span>
               </a>
-              <a href="${link('/#soluciones')}" role="menuitem">
+              <a href="https://seo.inhumario.com/" role="menuitem">
                 <strong>Posicionamiento SEO</strong>
                 <span>Dashboards y estrategia para subir en Google</span>
               </a>
