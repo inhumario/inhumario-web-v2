@@ -29,6 +29,10 @@
                 <strong>App para e-commerce</strong>
                 <span>Tu tienda en el bolsillo de tus clientes</span>
               </a>
+              <a href="https://alicia.inhumario.com/" role="menuitem">
+                <strong>Software de facturación</strong>
+                <span>Adiós a Excel: facturas con IA</span>
+              </a>
               <a href="${link('/#soluciones')}" role="menuitem">
                 <strong>Automatizaciones</strong>
                 <span>Procesos que se ejecutan solos 24/7</span>
