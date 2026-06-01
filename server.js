@@ -62,17 +62,28 @@ app.use(express.urlencoded({ extended: false, limit: "20kb" }));
 // Static
 app.use(express.static(path.join(__dirname, "public"), {
   setHeaders: (res, filePath) => {
-    if (/\.(css|js|png|jpe?g|webp|svg|gif|ico|woff2?|ttf|eot)$/.test(filePath)) {
+    const file = path.basename(filePath);
+    // nav.js: CORS abierto (lo cargan sub-webs como app.inhumario.com) + cache corto
+    if (file === "nav.js") {
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Cache-Control", "public, max-age=300, must-revalidate");
+    } else if (file === "logo.png" || file === "logo-white.png") {
+      // Logos también CORS abierto (los carga nav.js desde otros dominios)
+      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader("Cache-Control", "public, max-age=604800");
+    } else if (/\.(css|js|png|jpe?g|webp|svg|gif|ico|woff2?|ttf|eot)$/.test(filePath)) {
       res.setHeader("Cache-Control", "public, max-age=604800, immutable");
-    } else if (/\.html$/.test(filePath)) {
+    } else if (/\.html$|\.xml$/.test(filePath)) {
       res.setHeader("Cache-Control", "no-cache, must-revalidate");
     }
   },
 }));
 
-// Security headers
+// Security headers — X-Frame-Options no en nav.js para que pueda embeberse
 app.use((req, res, next) => {
-  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  if (!req.path.startsWith("/nav.js")) {
+    res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  }
   res.setHeader("X-Content-Type-Options", "nosniff");
   res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
   next();
