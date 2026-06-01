@@ -22,7 +22,7 @@
 
 <link rel="canonical" href="https://www.inhumario.com/">
 <link rel="icon" type="image/png" href="/assets/logo.png">
-<link rel="stylesheet" href="/styles.css?v=1">
+<link rel="stylesheet" href="/styles.css?v=2">
 
 <!-- JSON-LD schema.org -->
 <script type="application/ld+json">
@@ -52,10 +52,32 @@
       <img src="/assets/logo.png" alt="Inhumario">
     </a>
     <div class="nav-links">
-      <a href="#soluciones">Soluciones</a>
+      <div class="nav-dropdown">
+        <button class="dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+          Servicios
+          <svg class="chev" width="10" height="10" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 1 5 5 9 1"/></svg>
+        </button>
+        <div class="dropdown-menu" role="menu">
+          <a href="https://app.inhumario.com" target="_blank" rel="noopener" role="menuitem">
+            <strong>App para e-commerce</strong>
+            <span>Tu tienda en el bolsillo de tus clientes</span>
+          </a>
+          <a href="#soluciones" role="menuitem">
+            <strong>Automatizaciones</strong>
+            <span>Procesos que se ejecutan solos 24/7</span>
+          </a>
+          <a href="#soluciones" role="menuitem">
+            <strong>Agentes de IA</strong>
+            <span>Bots que trabajan por ti</span>
+          </a>
+          <a href="#soluciones" role="menuitem">
+            <strong>Integraciones</strong>
+            <span>Tus herramientas, conectadas</span>
+          </a>
+        </div>
+      </div>
       <a href="#caso">Caso de éxito</a>
       <a href="#mario">Sobre mí</a>
-      <a href="https://app.inhumario.com" target="_blank" rel="noopener">App</a>
     </div>
     <a class="nav-cta" href="#contacto">Hablemos</a>
   </div>
@@ -83,7 +105,7 @@
 <!-- ============ SOLUCIONES ============ -->
 <section id="soluciones">
   <div class="wrap">
-    <div class="eyebrow reveal">Soluciones</div>
+    <div class="eyebrow reveal">Servicios</div>
     <h2 class="reveal">Qué hago por tu negocio.</h2>
     <p class="lead reveal">No vendo tecnología — vendo tiempo, ventas y tranquilidad. Lo que pongo por debajo lo elijo yo según lo que necesites; tú solo ves resultados.</p>
 
@@ -93,10 +115,10 @@
         <div class="solution-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
         </div>
-        <h3>Tu tienda en su bolsillo</h3>
-        <p>App móvil propia para tu e-commerce. Tu marca en el icono del móvil de tus clientes. Notificaciones push que sí abren. Pedidos a un toque.</p>
+        <h3>App para e-commerce</h3>
+        <p>App móvil propia para tu tienda online. Tu marca en el icono del móvil de tus clientes. Notificaciones push que sí abren. Pedidos a un toque.</p>
         <p class="solution-result"><strong>Resultado real:</strong> en el lanzamiento de la app de Aromas de Té conseguimos el 48 % del volumen del día 1.</p>
-        <span class="solution-cta">Ver propuesta de apps <span class="arr">→</span></span>
+        <span class="solution-cta">Ver propuesta de la app <span class="arr">→</span></span>
       </a>
 
       <div class="solution-card reveal">
@@ -289,6 +311,30 @@
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Dropdown servicios: click toggle (además del hover desktop)
+  const dd = document.querySelector('.nav-dropdown');
+  if (dd) {
+    const toggle = dd.querySelector('.dropdown-toggle');
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dd.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', dd.classList.contains('open'));
+    });
+    document.addEventListener('click', (e) => {
+      if (!dd.contains(e.target)) {
+        dd.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      }
+    });
+    // Cerrar al hacer click en un item
+    dd.querySelectorAll('.dropdown-menu a').forEach(a => {
+      a.addEventListener('click', () => {
+        dd.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+  }
 
   const io = new IntersectionObserver((entries) => {
     entries.forEach(e => {

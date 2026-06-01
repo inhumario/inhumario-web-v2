@@ -375,13 +375,93 @@ p { font-size: 17px; color: var(--ink-soft); }
   gap: 26px;
   margin-left: auto;
   margin-right: 24px;
+  align-items: center;
 }
-.nav-links a {
+.nav-links > a {
   font-size: 14px;
   color: var(--ink);
   transition: opacity 0.2s;
 }
-.nav-links a:hover { opacity: 0.6; }
+.nav-links > a:hover { opacity: 0.6; }
+
+/* Dropdown servicios */
+.nav-dropdown {
+  position: relative;
+}
+.dropdown-toggle {
+  background: none;
+  border: 0;
+  padding: 0;
+  font: inherit;
+  font-size: 14px;
+  color: var(--ink);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: inherit;
+  transition: opacity 0.2s;
+}
+.dropdown-toggle:hover { opacity: 0.6; }
+.dropdown-toggle .chev {
+  transition: transform 0.2s;
+}
+.nav-dropdown.open .dropdown-toggle .chev,
+.nav-dropdown:hover .dropdown-toggle .chev {
+  transform: rotate(180deg);
+}
+.dropdown-menu {
+  position: absolute;
+  top: calc(100% + 14px);
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  min-width: 320px;
+  background: #FFFFFF;
+  border: 1px solid var(--line);
+  padding: 10px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+  z-index: 101;
+}
+.nav-dropdown:hover .dropdown-menu,
+.nav-dropdown.open .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+/* Puente invisible para que el cursor no se salga al pasar al menú */
+.nav-dropdown::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  height: 18px;
+}
+.dropdown-menu a {
+  display: block;
+  padding: 12px 14px;
+  color: var(--ink);
+  transition: background 0.15s;
+  text-decoration: none;
+}
+.dropdown-menu a:hover { background: var(--card); }
+.dropdown-menu a strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+.dropdown-menu a span {
+  display: block;
+  font-size: 12px;
+  color: var(--mute);
+}
+
 @media (max-width: 900px) {
   .nav-links { display: none; }
 }
