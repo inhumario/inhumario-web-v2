@@ -493,9 +493,12 @@ p { font-size: 17px; color: var(--ink-soft); }
 /* === Soluciones === */
 .solutions-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
   margin-top: 40px;
+}
+@media (max-width: 1024px) {
+  .solutions-grid { grid-template-columns: repeat(2, 1fr); }
 }
 .solution-card {
   padding: 36px 34px;

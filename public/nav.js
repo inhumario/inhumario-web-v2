@@ -29,9 +29,25 @@
                 <strong>App para e-commerce</strong>
                 <span>Tu tienda en el bolsillo de tus clientes</span>
               </a>
+              <a href="https://voz.inhumario.com/" role="menuitem">
+                <strong>Agentes de voz IA</strong>
+                <span>Atiende tu teléfono 24/7 con voz natural</span>
+              </a>
               <a href="https://alicia.inhumario.com/" role="menuitem">
-                <strong>Software de facturación</strong>
-                <span>Adiós a Excel: facturas con IA</span>
+                <strong>EasyFactu</strong>
+                <span>Adiós a Excel: facturación con IA</span>
+              </a>
+              <a href="${link('/#soluciones')}" role="menuitem">
+                <strong>Gestión de Amazon</strong>
+                <span>Listings y operativa Amazon automatizadas</span>
+              </a>
+              <a href="${link('/#soluciones')}" role="menuitem">
+                <strong>Posicionamiento SEO</strong>
+                <span>Dashboards y estrategia para subir en Google</span>
+              </a>
+              <a href="${link('/#soluciones')}" role="menuitem">
+                <strong>Webs a medida</strong>
+                <span>Plataformas web para tu sector</span>
               </a>
               <a href="${link('/#soluciones')}" role="menuitem">
                 <strong>Automatizaciones</strong>
@@ -98,11 +114,21 @@
     .inh-dropdown-menu {
       position: absolute; top: calc(100% + 14px); left: 50%;
       transform: translateX(-50%) translateY(8px);
-      min-width: 320px; background: #FFFFFF;
-      border: 1px solid #E5E5E5; padding: 10px;
+      width: 700px; max-width: calc(100vw - 40px);
+      background: #FFFFFF;
+      border: 1px solid #E5E5E5; padding: 14px;
       opacity: 0; visibility: hidden; pointer-events: none;
       transition: opacity 0.2s, transform 0.2s, visibility 0.2s;
       box-shadow: 0 12px 40px rgba(0,0,0,0.08); z-index: 101;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4px;
+    }
+    @media (max-width: 760px) {
+      .inh-dropdown-menu {
+        width: calc(100vw - 32px);
+        grid-template-columns: 1fr;
+      }
     }
     .inh-dropdown:hover .inh-dropdown-menu,
     .inh-dropdown.open .inh-dropdown-menu {
