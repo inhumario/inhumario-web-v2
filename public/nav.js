@@ -12,6 +12,23 @@
   const HOME = 'https://www.inhumario.com';
   const link = (path) => onMainSite ? path : HOME + path;
 
+  const SERVICES = [
+    { href: 'https://app.inhumario.com/', t: 'App para e-commerce', d: 'Tu tienda en el bolsillo de tus clientes' },
+    { href: 'https://voz.inhumario.com/', t: 'Agentes de voz IA', d: 'Atiende tu teléfono 24/7 con voz natural' },
+    { href: 'https://easyfactu.inhumario.com/', t: 'EasyFactu', d: 'Adiós a Excel: facturación con IA' },
+    { href: 'https://amazon.inhumario.com/', t: 'Gestión de Amazon', d: 'Listings y operativa Amazon automatizadas' },
+    { href: 'https://seo.inhumario.com/', t: 'Posicionamiento SEO', d: 'Dashboards y estrategia para subir en Google' },
+    { href: link('/#soluciones'),         t: 'Webs a medida', d: 'Plataformas web para tu sector' },
+    { href: link('/#soluciones'),         t: 'Automatizaciones', d: 'Procesos que se ejecutan solos 24/7' },
+    { href: link('/#soluciones'),         t: 'Agentes de IA', d: 'Bots que trabajan por ti' },
+    { href: link('/#soluciones'),         t: 'Integraciones', d: 'Tus herramientas, conectadas' },
+  ];
+  const serviceItems = SERVICES.map((s) => `
+    <a href="${s.href}" role="menuitem">
+      <strong>${s.t}</strong>
+      <span>${s.d}</span>
+    </a>`).join('');
+
   const NAV_HTML = `
     <nav class="inh-nav">
       <div class="inh-wrap inh-nav-inner">
@@ -24,49 +41,25 @@
               Servicios
               <svg class="inh-chev" width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="1 1 5 5 9 1"/></svg>
             </button>
-            <div class="inh-dropdown-menu" role="menu">
-              <a href="https://app.inhumario.com/" role="menuitem">
-                <strong>App para e-commerce</strong>
-                <span>Tu tienda en el bolsillo de tus clientes</span>
-              </a>
-              <a href="https://voz.inhumario.com/" role="menuitem">
-                <strong>Agentes de voz IA</strong>
-                <span>Atiende tu teléfono 24/7 con voz natural</span>
-              </a>
-              <a href="https://easyfactu.inhumario.com/" role="menuitem">
-                <strong>EasyFactu</strong>
-                <span>Adiós a Excel: facturación con IA</span>
-              </a>
-              <a href="https://amazon.inhumario.com/" role="menuitem">
-                <strong>Gestión de Amazon</strong>
-                <span>Listings y operativa Amazon automatizadas</span>
-              </a>
-              <a href="https://seo.inhumario.com/" role="menuitem">
-                <strong>Posicionamiento SEO</strong>
-                <span>Dashboards y estrategia para subir en Google</span>
-              </a>
-              <a href="${link('/#soluciones')}" role="menuitem">
-                <strong>Webs a medida</strong>
-                <span>Plataformas web para tu sector</span>
-              </a>
-              <a href="${link('/#soluciones')}" role="menuitem">
-                <strong>Automatizaciones</strong>
-                <span>Procesos que se ejecutan solos 24/7</span>
-              </a>
-              <a href="${link('/#soluciones')}" role="menuitem">
-                <strong>Agentes de IA</strong>
-                <span>Bots que trabajan por ti</span>
-              </a>
-              <a href="${link('/#soluciones')}" role="menuitem">
-                <strong>Integraciones</strong>
-                <span>Tus herramientas, conectadas</span>
-              </a>
-            </div>
+            <div class="inh-dropdown-menu" role="menu">${serviceItems}</div>
           </div>
           <a href="${link('/#caso')}">Caso de éxito</a>
           <a href="${link('/#mario')}">Sobre mí</a>
         </div>
         <a class="inh-nav-cta" href="${onMainSite ? '#contacto' : link('/#contacto')}">Hablemos</a>
+        <button class="inh-burger" aria-label="Abrir menú" aria-expanded="false" type="button">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+      <div class="inh-mobile-overlay" aria-hidden="true">
+        <div class="inh-mobile-inner">
+          <div class="inh-mobile-label">Servicios</div>
+          <div class="inh-mobile-services">${serviceItems}</div>
+          <div class="inh-mobile-divider"></div>
+          <a class="inh-mobile-link" href="${link('/#caso')}">Caso de éxito</a>
+          <a class="inh-mobile-link" href="${link('/#mario')}">Sobre mí</a>
+          <a class="inh-mobile-cta" href="${onMainSite ? '#contacto' : link('/#contacto')}">Hablemos</a>
+        </div>
       </div>
     </nav>
   `;
@@ -155,9 +148,65 @@
     }
     .inh-nav-cta:hover { background: #000000; }
 
+    /* === Burger + Overlay móvil === */
+    .inh-burger {
+      display: none;
+      background: none; border: 0; padding: 8px;
+      cursor: pointer; margin-left: auto;
+    }
+    .inh-burger span {
+      display: block; width: 26px; height: 2px;
+      background: #111111; margin: 6px 0;
+      transition: transform 0.25s, opacity 0.2s;
+    }
+    .inh-nav.inh-open .inh-burger span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+    .inh-nav.inh-open .inh-burger span:nth-child(2) { opacity: 0; }
+    .inh-nav.inh-open .inh-burger span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+    .inh-mobile-overlay {
+      display: none;
+      position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+      background: #FFFFFF;
+      z-index: 99;
+      padding: 88px 24px 32px;
+      overflow-y: auto;
+      opacity: 0;
+      transition: opacity 0.25s;
+    }
+    .inh-nav.inh-open .inh-mobile-overlay {
+      opacity: 1; pointer-events: auto;
+    }
+    .inh-mobile-inner { max-width: 540px; margin: 0 auto; }
+    .inh-mobile-label {
+      font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+      color: #666666; font-weight: 700; margin-bottom: 14px;
+    }
+    .inh-mobile-services a {
+      display: block; padding: 14px 0;
+      color: #111111; text-decoration: none;
+      border-bottom: 1px solid #E5E5E5;
+    }
+    .inh-mobile-services a strong { display: block; font-size: 16px; margin-bottom: 2px; }
+    .inh-mobile-services a span { display: block; font-size: 13px; color: #666666; }
+    .inh-mobile-divider { height: 24px; }
+    .inh-mobile-link {
+      display: block; padding: 14px 0;
+      font-size: 18px; font-weight: 700; color: #111111; text-decoration: none;
+      border-bottom: 1px solid #E5E5E5;
+    }
+    .inh-mobile-cta {
+      display: block; margin-top: 28px; padding: 18px 24px;
+      text-align: center; background: #111111; color: #FFFFFF !important;
+      font-weight: 700; text-decoration: none; font-size: 16px;
+    }
+    body.inh-locked { overflow: hidden; }
+
     @media (max-width: 900px) {
       .inh-nav-links { display: none; }
+      .inh-nav-cta { display: none; }
+      .inh-burger { display: block; }
+      .inh-mobile-overlay { display: block; pointer-events: none; }
       .inh-logo img { height: 40px; }
+      .inh-nav-inner { padding: 12px 0; }
     }
   `;
 
@@ -198,6 +247,33 @@
         toggle.setAttribute('aria-expanded', 'false');
       });
     });
+
+    // Burger móvil
+    const nav = document.querySelector('.inh-nav');
+    const burger = document.querySelector('.inh-burger');
+    if (nav && burger) {
+      const close = () => {
+        nav.classList.remove('inh-open');
+        burger.setAttribute('aria-expanded', 'false');
+        document.body.classList.remove('inh-locked');
+      };
+      const open = () => {
+        nav.classList.add('inh-open');
+        burger.setAttribute('aria-expanded', 'true');
+        document.body.classList.add('inh-locked');
+      };
+      burger.addEventListener('click', () => {
+        nav.classList.contains('inh-open') ? close() : open();
+      });
+      // Cerrar al hacer click en cualquier enlace del overlay
+      nav.querySelectorAll('.inh-mobile-overlay a').forEach((a) => {
+        a.addEventListener('click', close);
+      });
+      // Cerrar con Escape
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && nav.classList.contains('inh-open')) close();
+      });
+    }
   }
 
   if (document.readyState === 'loading') {
