@@ -77,7 +77,10 @@
     .inh-nav-inner {
       display: flex; align-items: center; justify-content: space-between;
       gap: 28px; padding: 16px 0;
+      position: relative;
     }
+    html { overflow-x: hidden; }
+    body { overflow-x: hidden; max-width: 100vw; }
     .inh-logo { display: inline-flex; }
     .inh-logo img { height: 56px; width: auto; display: block; }
     .inh-nav-links {
@@ -152,7 +155,10 @@
     .inh-burger {
       display: none;
       background: none; border: 0; padding: 8px;
-      cursor: pointer; margin-left: auto;
+      cursor: pointer;
+      position: absolute; right: 0; top: 50%;
+      transform: translateY(-50%);
+      z-index: 102;
     }
     .inh-burger span {
       display: block; width: 26px; height: 2px;
