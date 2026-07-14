@@ -194,6 +194,11 @@ app.post("/api/contact", async (req, res) => {
 
 app.get("/api/health", (req, res) => res.json({ ok: true, version: "1.0" }));
 
+// Landing de respuesta a reseñas con IA
+app.get(["/resenas", "/reseñas"], (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "resenas.html"));
+});
+
 // Fallback SPA: cualquier ruta no encontrada → index.html
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));

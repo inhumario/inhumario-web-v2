@@ -15,6 +15,7 @@
   const SERVICES = [
     { href: 'https://app.inhumario.com/', t: 'App para e-commerce', d: 'Tu tienda en el bolsillo de tus clientes' },
     { href: 'https://voz.inhumario.com/', t: 'Agentes de voz IA', d: 'Atiende tu teléfono 24/7 con voz natural' },
+    { href: 'https://www.inhumario.com/resenas', t: 'Respuesta a reseñas IA', d: 'Trusted Shops y Google respondidas en tu tono' },
     { href: 'https://easyfactu.inhumario.com/', t: 'EasyFactu', d: 'Adiós a Excel: facturación con IA' },
     { href: 'https://amazon.inhumario.com/', t: 'Gestión de Amazon', d: 'Listings y operativa Amazon automatizadas' },
     { href: 'https://seo.inhumario.com/', t: 'Posicionamiento SEO', d: 'Dashboards y estrategia para subir en Google' },
