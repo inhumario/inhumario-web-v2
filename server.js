@@ -67,7 +67,7 @@ app.use(express.static(path.join(__dirname, "public"), {
     if (file === "nav.js") {
       res.setHeader("Access-Control-Allow-Origin", "*");
       res.setHeader("Cache-Control", "public, max-age=300, must-revalidate");
-    } else if (file === "logo.png" || file === "logo-white.png" || file === "banner-linkedin.png" || file === "icon-square.png") {
+    } else if (file === "logo.png" || file === "logo-white.png" || file === "banner-linkedin.png" || file === "icon-square.png" || file === "icon-square-512.png" || file === "portada-fb.png") {
       // Logos también CORS abierto (los carga nav.js desde otros dominios)
       res.setHeader("Access-Control-Allow-Origin", "*");
       res.setHeader("Cache-Control", "public, max-age=604800");
