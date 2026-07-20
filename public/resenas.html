@@ -267,6 +267,20 @@
   </div>
 </section>
 
+<!-- ============ NEWSLETTER ============ -->
+<section id="newsletter" style="background:#111; padding:56px 0;">
+  <div class="wrap" style="max-width:640px; text-align:center;">
+    <h2 style="color:#fff; font-size:1.5rem; margin:0 0 10px;">📬 Te contamos cómo automatizamos nuestra tienda</h2>
+    <p style="color:#B5B5B5; margin:0 0 22px;">Casos reales de reseñas y automatización, sin humo y sin spam: un par de emails al mes.</p>
+    <form id="newsletter-form" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+      <input type="text" name="website" style="display:none" tabindex="-1" autocomplete="off">
+      <input type="email" name="email" required placeholder="tu@email.com" style="flex:1 1 240px; max-width:320px; padding:12px 14px; border-radius:8px; border:1px solid #333; background:#1F1F1F; color:#fff; font-size:1rem;">
+      <button type="submit" style="padding:12px 22px; border-radius:8px; border:0; background:#FF8080; color:#111; font-weight:700; font-size:1rem; cursor:pointer;">Suscribirme</button>
+      <div id="newsletter-status" role="status" aria-live="polite" style="flex-basis:100%; color:#B5B5B5; margin-top:8px; min-height:1.2em;"></div>
+    </form>
+  </div>
+</section>
+
 <!-- ============ FOOTER ============ -->
 <footer>
   <div class="wrap">
@@ -288,6 +302,34 @@
 
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
+
+  // Newsletter
+  const nlForm = document.getElementById('newsletter-form');
+  if (nlForm) {
+    nlForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = document.getElementById('newsletter-status');
+      const data = Object.fromEntries(new FormData(nlForm));
+      data.origen = 'resenas';
+      status.textContent = 'Un momento…';
+      try {
+        const r = await fetch('/api/newsletter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const j = await r.json();
+        if (j.ok) {
+          status.textContent = '✅ ¡Dentro! Te escribimos pronto.';
+          nlForm.querySelector('[name=email]').value = '';
+        } else {
+          status.textContent = j.error || 'No se pudo completar el alta.';
+        }
+      } catch {
+        status.textContent = 'Error de conexión. Inténtalo de nuevo.';
+      }
+    });
+  }
 
   // Reveal on scroll
   const io = new IntersectionObserver((entries) => {

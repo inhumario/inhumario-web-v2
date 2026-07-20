@@ -192,6 +192,65 @@ app.post("/api/contact", async (req, res) => {
   }
 });
 
+// Newsletter: alta en la lista de Klaviyo "Inhumario — Newsletter"
+const KLAVIYO_API_KEY = process.env.KLAVIYO_API_KEY;
+const KLAVIYO_LIST_ID = process.env.KLAVIYO_LIST_ID || "S6HWmj";
+
+app.post("/api/newsletter", async (req, res) => {
+  const ip = (req.headers["x-forwarded-for"] || req.ip || "").split(",")[0].trim();
+  if (req.body.website && req.body.website.length > 0) {
+    return res.status(200).json({ ok: true }); // honeypot
+  }
+  if (!rateLimit(ip)) {
+    return res.status(429).json({ ok: false, error: "Demasiados envíos. Inténtalo más tarde." });
+  }
+  const email = clean(req.body.email, 200);
+  if (!isEmail(email)) {
+    return res.status(400).json({ ok: false, error: "Email no válido." });
+  }
+  if (!KLAVIYO_API_KEY) {
+    console.error("[NEWSLETTER] KLAVIYO_API_KEY no configurada");
+    return res.status(500).json({ ok: false, error: "Servicio no disponible." });
+  }
+  const origen = clean(req.body.origen, 60) || "web";
+  try {
+    const r = await fetch("https://a.klaviyo.com/api/profile-subscription-bulk-create-jobs/", {
+      method: "POST",
+      headers: {
+        "Authorization": `Klaviyo-API-Key ${KLAVIYO_API_KEY}`,
+        "Content-Type": "application/json",
+        "revision": "2024-10-15",
+      },
+      body: JSON.stringify({
+        data: {
+          type: "profile-subscription-bulk-create-job",
+          attributes: {
+            custom_source: `inhumario.com (${origen})`,
+            profiles: {
+              data: [{
+                type: "profile",
+                attributes: {
+                  email,
+                  subscriptions: { email: { marketing: { consent: "SUBSCRIBED" } } },
+                },
+              }],
+            },
+          },
+          relationships: { list: { data: { type: "list", id: KLAVIYO_LIST_ID } } },
+        },
+      }),
+    });
+    if (r.status >= 300) {
+      console.error("[NEWSLETTER] Klaviyo", r.status, (await r.text()).slice(0, 300));
+      return res.status(500).json({ ok: false, error: "No se pudo completar el alta. Inténtalo más tarde." });
+    }
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error("[NEWSLETTER] error:", err.message);
+    return res.status(500).json({ ok: false, error: "No se pudo completar el alta. Inténtalo más tarde." });
+  }
+});
+
 app.get("/api/health", (req, res) => res.json({ ok: true, version: "1.0" }));
 
 // Landing de respuesta a reseñas con IA
