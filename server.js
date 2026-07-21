@@ -72,6 +72,12 @@ app.use(express.static(path.join(__dirname, "public"), {
       res.setHeader("Access-Control-Allow-Origin", "*");
       res.setHeader("Cache-Control", "public, max-age=604800");
     } else if (/\.(css|js|png|jpe?g|webp|svg|gif|ico|woff2?|ttf|eot)$/.test(filePath)) {
+      // Todo lo de /assets con CORS abierto: son piezas públicas pensadas para
+      // incrustarse fuera (imágenes de posts que suben IG/FB por URL, y la
+      // publicación por navegador, que las lee con fetch desde linkedin.com).
+      if (filePath.includes(`${path.sep}assets${path.sep}`)) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+      }
       res.setHeader("Cache-Control", "public, max-age=604800, immutable");
     } else if (/\.html$|\.xml$/.test(filePath)) {
       res.setHeader("Cache-Control", "no-cache, must-revalidate");
