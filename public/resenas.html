@@ -348,7 +348,11 @@
     const utm = new URLSearchParams({ utm_source: de ? 'recomendacion' : 'landing', utm_campaign: 'resenas' });
     if (de) utm.set('utm_content', de);
     document.querySelectorAll('a[data-calendly], a[data-app]').forEach(a => {
-      a.href = a.href + (a.href.includes('?') ? '&' : '?') + utm.toString();
+      const p = new URLSearchParams(utm);
+      // La app de reseñas mide el embudo con ?de= (main.py: st.query_params["de"]),
+      // NO con utm_content. Sin esto el alta se registra con origen vacío.
+      if (de && a.hasAttribute('data-app')) p.set('de', de);
+      a.href = a.href + (a.href.includes('?') ? '&' : '?') + p.toString();
     });
 
     let waText = 'Hola Mario, tengo una tienda con reseñas sin responder y quiero saber más de la app.';
