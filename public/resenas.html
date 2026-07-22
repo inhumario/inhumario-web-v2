@@ -54,6 +54,38 @@
 .plans-note strong { color: var(--ink); }
 .quote-mark { color: var(--light); }
 .referral-note { margin-top: 26px; font-size: 13px; color: var(--light); }
+/* Alta desde la landing */
+.sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip:rect(0 0 0 0); white-space:nowrap; border:0; }
+.hp { display:none !important; }
+.alta-form { margin-top: 32px; }
+.alta-campos { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+.alta-campos input[type=text], .alta-campos input[type=email] {
+  flex:1 1 260px; max-width:320px; padding:14px 16px; border-radius:10px;
+  border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.07);
+  color:#fff; font-size:15px; font-family:inherit;
+}
+.alta-campos input::placeholder { color:rgba(255,255,255,.5); }
+.alta-campos input:focus { outline:2px solid var(--coral, #FF8080); outline-offset:1px; background:rgba(255,255,255,.12); }
+.alta-campos .btn { flex:0 0 auto; }
+.alta-legal { margin-top:14px; font-size:13px; color:var(--light); }
+.alta-status { margin-top:10px; font-size:14px; color:#fff; min-height:1.2em; }
+@media (max-width:640px) {
+  .alta-campos { flex-direction:column; align-items:stretch; }
+  .alta-campos input[type=text], .alta-campos input[type=email] { max-width:none; }
+  .alta-campos .btn { width:100%; justify-content:center; }
+}
+/* Conexión de reseñas + qué incluye la prueba */
+.conn-grid { display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:20px; margin-top:36px; }
+.conn-card { background:#fff; border:1px solid #E6E6E6; border-radius:12px; padding:22px; }
+.conn-tag { font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:#FF6B6B; margin-bottom:10px; }
+.conn-card h3 { font-size:1.05rem; margin:0 0 8px; line-height:1.3; }
+.conn-card p { margin:0; font-size:14px; line-height:1.65; color:#555; }
+.trial-box { margin-top:34px; background:#0B0B0C; color:#fff; border-radius:14px; padding:28px; }
+.trial-box h3 { margin:0 0 16px; font-size:1.15rem; color:#fff; }
+.trial-list { margin:0; padding-left:20px; }
+.trial-list li { margin-bottom:10px; font-size:15px; line-height:1.6; color:#D8D8D8; }
+.trial-list li strong { color:#fff; }
+@media (max-width:640px) { .trial-box { padding:20px; } .conn-card { padding:18px; } }
 .cta-row { display: flex; gap: 12px; margin-top: 40px; flex-wrap: wrap; }
 .cta-final .cta-row { justify-content: center; }
 @media (max-width: 700px) {
@@ -213,6 +245,44 @@
   </div>
 </section>
 
+<!-- ============ CONEXIÓN + QUÉ INCLUYE LA PRUEBA ============ -->
+<section id="conectar">
+  <div class="wrap">
+    <div class="eyebrow reveal">Antes de empezar</div>
+    <h2 class="reveal">¿Y cómo conecto<br>mis reseñas?</h2>
+    <p class="lead reveal">Es la primera pregunta de todo el mundo. No hay que instalar nada en tu web ni tocar tu tienda: solo darnos permiso de lectura sobre tus reseñas.</p>
+
+    <div class="conn-grid reveal">
+      <div class="conn-card">
+        <div class="conn-tag">Google</div>
+        <h3>Nos invitas como gestor de tu ficha</h3>
+        <p>Desde tu Perfil de Empresa de Google: <strong>Usuarios → Añadir</strong>, y nos invitas. Aceptamos, eliges tu ficha en la app y ya se leen tus reseñas. Sin papeleo con Google y sin darnos tu contraseña — puedes revocarlo tú cuando quieras, desde el mismo sitio.</p>
+      </div>
+      <div class="conn-card">
+        <div class="conn-tag">Trusted Shops</div>
+        <h3>Con tus credenciales de la API</h3>
+        <p>Trusted Shops te da unas claves de acceso para tu cuenta. Las pegas una vez en la app y la conexión queda hecha. Si no sabes de dónde sacarlas, te lo hacemos nosotros.</p>
+      </div>
+      <div class="conn-card">
+        <div class="conn-tag">¿No quieres pelearte con esto?</div>
+        <h3>Te lo dejamos conectado</h3>
+        <p>El setup asistido incluye la conexión de ambas, el análisis de tu web y la calibración del tono con tus respuestas anteriores. Te lo ofrecemos al crear tu cuenta, como servicio aparte.</p>
+      </div>
+    </div>
+
+    <div class="trial-box reveal">
+      <h3>Qué incluye la prueba, exactamente</h3>
+      <ul class="trial-list">
+        <li><strong>5 respuestas gratis</strong>, publicadas sobre tus reseñas reales — no una demo con datos de mentira.</li>
+        <li><strong>Todas las funciones</strong>: tono propio, keywords, revisión antes de publicar. No hay versión capada.</li>
+        <li><strong>Sin tarjeta</strong> y sin permanencia. Solo empresa, email y contraseña.</li>
+        <li>Cuando gastas las 5, <strong>la app se para y te avisa</strong>. No se cobra nada solo: si quieres seguir, eliges plan desde tu panel.</li>
+        <li>Si no sigues, <strong>tus datos se quedan guardados</strong> por si vuelves.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
 <!-- ============ PRECIOS ============ -->
 <section id="precios" style="background:#F7F7F7;">
   <div class="wrap">
@@ -257,8 +327,25 @@
     <div class="eyebrow reveal">Siguiente paso</div>
     <h2 class="reveal">Pruébalo ahora con tus reseñas.</h2>
     <p class="lead reveal">Crea tu cuenta en 2 minutos y responde gratis tus 5 primeras reseñas. ¿Prefieres verlo antes conmigo? 15 minutos, sin compromiso: te enseño el sistema funcionando con TUS reseñas reales.</p>
+
+    <!-- Alta empezada aquí mismo: empresa + email; la contraseña se elige ya en la app -->
+    <form id="alta-form" class="alta-form reveal" novalidate>
+      <div class="alta-campos">
+        <label class="sr-only" for="alta-empresa">Nombre de tu tienda</label>
+        <input id="alta-empresa" name="empresa" type="text" autocomplete="organization"
+               placeholder="Nombre de tu tienda" required maxlength="120">
+        <label class="sr-only" for="alta-email">Tu email</label>
+        <input id="alta-email" name="email" type="email" autocomplete="email"
+               placeholder="tu@empresa.com" required maxlength="200">
+        <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hp">
+        <button class="btn btn-primary" type="submit">🚀 Empezar gratis <span class="arr">→</span></button>
+      </div>
+      <p class="alta-legal">Solo queda elegir contraseña. <strong>Sin tarjeta</strong> · 5 respuestas gratis · Sin permanencia</p>
+      <p class="alta-status" id="alta-status" role="status" aria-live="polite"></p>
+    </form>
+
     <div class="cta-row reveal">
-      <a class="btn btn-primary" data-app href="https://reviews.inhumario.com/?alta=1">🚀 Empezar prueba gratis <span class="arr">→</span></a>
+      <a class="btn btn-ghost" data-app href="https://reviews.inhumario.com/?alta=1">Ya tengo cuenta / entrar <span class="arr">→</span></a>
       <a class="btn btn-ghost" data-calendly href="https://calendly.com/cuadrado-mario/conocer">Reserva 15 minutos</a>
       <a class="btn btn-ghost" data-whatsapp href="https://wa.me/34650012448">WhatsApp: 650 012 448</a>
     </div>
@@ -364,6 +451,38 @@
     if (de) {
       const note = document.getElementById('referral-note');
       if (note) note.hidden = false;
+    }
+
+    // Alta empezada en la landing: guardamos empresa+email en un token efímero
+    // (para no llevarlos en la URL) y saltamos a la app, que solo pedirá contraseña.
+    const altaForm = document.getElementById('alta-form');
+    if (altaForm) {
+      altaForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const status = document.getElementById('alta-status');
+        const btn = altaForm.querySelector('button[type=submit]');
+        const datos = Object.fromEntries(new FormData(altaForm));
+        if (!datos.empresa || !datos.empresa.trim()) { status.textContent = 'Escribe el nombre de tu tienda.'; return; }
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(datos.email || '')) { status.textContent = 'Escribe un email válido.'; return; }
+        btn.disabled = true;
+        status.textContent = 'Un momento…';
+        const destino = new URL('https://reviews.inhumario.com/');
+        destino.searchParams.set('alta', '1');
+        if (de) destino.searchParams.set('de', de);
+        try {
+          const r = await fetch('/api/prefill', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(datos),
+          });
+          const j = await r.json();
+          if (j.ok && j.token) destino.searchParams.set('pf', j.token);
+          else if (j.error) { status.textContent = j.error; btn.disabled = false; return; }
+        } catch {
+          // Si el guardado falla, seguimos igualmente: la app pedirá los datos.
+        }
+        window.location.href = destino.toString();
+      });
     }
   })();
 </script>

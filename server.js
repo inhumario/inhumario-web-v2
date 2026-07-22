@@ -1,6 +1,7 @@
 const express = require("express");
 const path = require("path");
 const nodemailer = require("nodemailer");
+const crypto = require("crypto"); // node:crypto — el `crypto` global es Web Crypto y no trae randomBytes
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -255,6 +256,53 @@ app.post("/api/newsletter", async (req, res) => {
     console.error("[NEWSLETTER] error:", err.message);
     return res.status(500).json({ ok: false, error: "No se pudo completar el alta. Inténtalo más tarde." });
   }
+});
+
+// ── Arranque de prueba desde la landing ────────────────────────────────────
+// El visitante escribe empresa + email aquí; la contraseña la elige ya en la
+// app (que es quien tiene la BD y el cifrado — no se duplica esa lógica).
+// Para no pasar el email por la URL, los datos se guardan en memoria bajo un
+// token efímero que la app canjea una sola vez.
+const prefills = new Map(); // token -> { empresa, email, expira }
+const PREFILL_TTL_MS = 20 * 60 * 1000;
+
+function limpiaPrefills() {
+  const ahora = Date.now();
+  for (const [t, v] of prefills) if (v.expira < ahora) prefills.delete(t);
+}
+setInterval(limpiaPrefills, 5 * 60 * 1000).unref();
+
+app.post("/api/prefill", (req, res) => {
+  const ip = (req.headers["x-forwarded-for"] || req.ip || "").split(",")[0].trim();
+  if (req.body.website && req.body.website.length > 0) {
+    return res.status(200).json({ ok: true, token: "" }); // honeypot
+  }
+  if (!rateLimit(ip)) {
+    return res.status(429).json({ ok: false, error: "Demasiados intentos. Espera un momento." });
+  }
+  const empresa = clean(req.body.empresa, 120);
+  const email = clean(req.body.email, 200);
+  if (!empresa) return res.status(400).json({ ok: false, error: "Escribe el nombre de tu tienda." });
+  if (!isEmail(email)) return res.status(400).json({ ok: false, error: "Escribe un email válido." });
+
+  limpiaPrefills();
+  if (prefills.size > 5000) return res.status(503).json({ ok: false, error: "Servicio saturado. Inténtalo en un minuto." });
+
+  const token = crypto.randomBytes(12).toString("base64url");
+  prefills.set(token, { empresa, email, expira: Date.now() + PREFILL_TTL_MS });
+  return res.json({ ok: true, token });
+});
+
+// La app llama a este endpoint (servidor a servidor) para recuperar los datos.
+// Un solo uso: se borra al leerlo.
+app.get("/api/prefill/:token", (req, res) => {
+  const v = prefills.get(req.params.token);
+  if (!v || v.expira < Date.now()) {
+    prefills.delete(req.params.token);
+    return res.status(404).json({ ok: false });
+  }
+  prefills.delete(req.params.token);
+  return res.json({ ok: true, empresa: v.empresa, email: v.email });
 });
 
 app.get("/api/health", (req, res) => res.json({ ok: true, version: "1.0" }));
