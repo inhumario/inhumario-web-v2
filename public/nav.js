@@ -45,6 +45,7 @@
             <div class="inh-dropdown-menu" role="menu">${serviceItems}</div>
           </div>
           <a href="${link('/#caso')}">Caso de éxito</a>
+          <a href="${link('/blog')}">Blog</a>
           <a href="${link('/#mario')}">Sobre mí</a>
         </div>
         <a class="inh-nav-cta" href="${onMainSite ? '#contacto' : link('/#contacto')}">Hablemos</a>
@@ -58,6 +59,7 @@
           <div class="inh-mobile-services">${serviceItems}</div>
           <div class="inh-mobile-divider"></div>
           <a class="inh-mobile-link" href="${link('/#caso')}">Caso de éxito</a>
+          <a class="inh-mobile-link" href="${link('/blog')}">Blog</a>
           <a class="inh-mobile-link" href="${link('/#mario')}">Sobre mí</a>
           <a class="inh-mobile-cta" href="${onMainSite ? '#contacto' : link('/#contacto')}">Hablemos</a>
         </div>

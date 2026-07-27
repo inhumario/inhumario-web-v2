@@ -4,6 +4,7 @@ COPY package.json ./
 RUN npm install --omit=dev --no-audit --no-fund
 COPY server.js ./
 COPY public ./public
+COPY content ./content
 ENV NODE_ENV=production
 ENV PORT=3000
 EXPOSE 3000

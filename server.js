@@ -1,7 +1,9 @@
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto"); // node:crypto — el `crypto` global es Web Crypto y no trae randomBytes
+const { marked } = require("marked");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -306,6 +308,301 @@ app.get("/api/prefill/:token", (req, res) => {
 });
 
 app.get("/api/health", (req, res) => res.json({ ok: true, version: "1.0" }));
+
+// ============================================================
+// Blog — artículos markdown en content/blog/*.md
+// Frontmatter: title, description, date (YYYY-MM-DD), slug y cover opcionales.
+// Un post con fecha futura no se publica hasta que llegue el día.
+// ============================================================
+const BLOG_DIR = path.join(__dirname, "content", "blog");
+const BLOG_TTL_MS = 60 * 1000;
+let blogCache = { at: 0, posts: [] };
+
+function hoyMadrid() {
+  // YYYY-MM-DD en hora española (en-CA da formato ISO)
+  return new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/Madrid" }).format(new Date());
+}
+
+function parseFrontmatter(raw) {
+  const m = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n?/);
+  if (!m) return { meta: {}, body: raw };
+  const meta = {};
+  for (const line of m[1].split(/\r?\n/)) {
+    const i = line.indexOf(":");
+    if (i === -1) continue;
+    meta[line.slice(0, i).trim()] = line.slice(i + 1).trim().replace(/^["']|["']$/g, "");
+  }
+  return { meta, body: raw.slice(m[0].length) };
+}
+
+const MESES = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+function fechaBonita(iso) {
+  const [y, mo, d] = iso.split("-").map(Number);
+  if (!y || !mo || !d) return iso;
+  return `${d} de ${MESES[mo - 1]} de ${y}`;
+}
+
+function loadPosts() {
+  const now = Date.now();
+  if (now - blogCache.at < BLOG_TTL_MS) return blogCache.posts;
+  const posts = [];
+  let files = [];
+  try {
+    files = fs.readdirSync(BLOG_DIR).filter((f) => f.endsWith(".md") && !f.startsWith("README"));
+  } catch { /* sin carpeta de blog aún */ }
+  const hoy = hoyMadrid();
+  for (const file of files) {
+    try {
+      const raw = fs.readFileSync(path.join(BLOG_DIR, file), "utf8");
+      const { meta, body } = parseFrontmatter(raw);
+      const base = file.replace(/\.md$/, "");
+      const slug = (meta.slug || base.replace(/^\d{4}-\d{2}-\d{2}-/, "")).toLowerCase();
+      const date = meta.date || (base.match(/^\d{4}-\d{2}-\d{2}/) || [""])[0];
+      if (!meta.title || !/^\d{4}-\d{2}-\d{2}$/.test(date)) {
+        console.warn(`[BLOG] ${file}: falta title o date (YYYY-MM-DD) — no se publica`);
+        continue;
+      }
+      if (date > hoy) continue; // programado a futuro
+      const minutos = Math.max(1, Math.round(body.split(/\s+/).length / 200));
+      posts.push({
+        slug,
+        date,
+        fecha: fechaBonita(date),
+        minutos,
+        title: meta.title,
+        description: meta.description || "",
+        cover: meta.cover || "",
+        html: marked.parse(body),
+      });
+    } catch (err) {
+      console.error(`[BLOG] error leyendo ${file}:`, err.message);
+    }
+  }
+  posts.sort((a, b) => b.date.localeCompare(a.date));
+  blogCache = { at: now, posts };
+  return posts;
+}
+
+function pageShell({ title, description, canonical, ogImage, jsonld, content }) {
+  return `<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#111111">
+<title>${escapeHtml(title)}</title>
+<meta name="description" content="${escapeHtml(description)}">
+<meta property="og:title" content="${escapeHtml(title)}">
+<meta property="og:description" content="${escapeHtml(description)}">
+<meta property="og:type" content="article">
+<meta property="og:url" content="${escapeHtml(canonical)}">
+<meta property="og:image" content="${escapeHtml(ogImage || "https://www.inhumario.com/assets/logo.png")}">
+<meta property="og:locale" content="es_ES">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${escapeHtml(title)}">
+<meta name="twitter:description" content="${escapeHtml(description)}">
+<link rel="canonical" href="${escapeHtml(canonical)}">
+<link rel="icon" type="image/png" href="/assets/logo.png">
+<link rel="stylesheet" href="/styles.css?v=6">
+${jsonld ? `<script type="application/ld+json">${jsonld}</script>` : ""}
+</head>
+<body>
+
+<div id="inhumario-nav"></div>
+<script src="/nav.js?v=2"></script>
+
+${content}
+
+<section id="newsletter" style="background:#111; padding:56px 0;">
+  <div class="wrap" style="max-width:640px; text-align:center;">
+    <h2 style="color:#fff; font-size:1.5rem; margin:0 0 10px;">📬 Te contamos cómo automatizamos nuestra tienda</h2>
+    <p style="color:#B5B5B5; margin:0 0 22px;">Casos reales, sin humo y sin spam: un par de emails al mes.</p>
+    <form id="newsletter-form" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+      <input type="text" name="website" style="display:none" tabindex="-1" autocomplete="off">
+      <input type="email" name="email" required placeholder="tu@email.com" style="flex:1 1 240px; max-width:320px; padding:12px 14px; border-radius:8px; border:1px solid #333; background:#1F1F1F; color:#fff; font-size:1rem;">
+      <button type="submit" style="padding:12px 22px; border-radius:8px; border:0; background:#FF8080; color:#111; font-weight:700; font-size:1rem; cursor:pointer;">Suscribirme</button>
+      <div id="newsletter-status" role="status" aria-live="polite" style="flex-basis:100%; color:#B5B5B5; margin-top:8px; min-height:1.2em;"></div>
+    </form>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <img src="/assets/logo.png" alt="Inhumario">
+    <div class="divider"></div>
+    <p>© <span id="year"></span> Inhumario · Mario Cuadrado · Sonseca, Toledo</p>
+    <p class="tagline">Automatizaciones que trabajan por tí</p>
+    <p class="footer-links">
+      <a href="/blog">Blog</a>
+      <span>·</span>
+      <a href="https://app.inhumario.com" target="_blank" rel="noopener">App móvil para tu tienda</a>
+      <span>·</span>
+      <a href="https://www.aromasdete.com" target="_blank" rel="noopener">Aromas de Té</a>
+    </p>
+  </div>
+</footer>
+
+<script>
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  const nlForm = document.getElementById('newsletter-form');
+  if (nlForm) {
+    nlForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const status = document.getElementById('newsletter-status');
+      const data = Object.fromEntries(new FormData(nlForm));
+      data.origen = 'blog';
+      status.textContent = 'Un momento…';
+      try {
+        const r = await fetch('/api/newsletter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+        });
+        const j = await r.json();
+        if (j.ok) {
+          status.textContent = '✅ ¡Dentro! Te escribimos pronto.';
+          nlForm.querySelector('[name=email]').value = '';
+        } else {
+          status.textContent = j.error || 'No se pudo completar el alta.';
+        }
+      } catch {
+        status.textContent = 'Error de conexión. Inténtalo de nuevo.';
+      }
+    });
+  }
+
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        io.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+
+</body>
+</html>`;
+}
+
+app.get("/blog", (req, res) => {
+  const posts = loadPosts();
+  const cards = posts.map((p) => `
+      <a class="blog-card reveal" href="/blog/${escapeHtml(p.slug)}">
+        <div class="blog-card-meta">${escapeHtml(p.fecha)} · ${p.minutos} min de lectura</div>
+        <h2>${escapeHtml(p.title)}</h2>
+        <p>${escapeHtml(p.description)}</p>
+        <span class="solution-cta">Leer artículo <span class="arr">→</span></span>
+      </a>`).join("\n");
+
+  const content = `
+<section class="blog-hero dark" style="background:#111;">
+  <div class="wrap">
+    <div class="eyebrow reveal">Blog</div>
+    <h1 class="reveal" style="font-size:clamp(34px,5vw,56px); color:#fff;">Casos reales de automatización.</h1>
+    <p class="lead reveal">Cada semana, un caso con nombre y números: el problema, la automatización que lo resuelve y el resultado. Sin humo.</p>
+  </div>
+</section>
+<section style="padding:70px 0;">
+  <div class="wrap">
+    <div class="blog-list">
+      ${posts.length ? cards : '<p style="color:var(--mute);">Todavía no hay artículos publicados. Vuelve pronto.</p>'}
+    </div>
+  </div>
+</section>`;
+
+  res.setHeader("Cache-Control", "no-cache, must-revalidate");
+  res.send(pageShell({
+    title: "Blog · Inhumario — Casos reales de automatización",
+    description: "Casos reales de automatización para e-commerce y pymes: el problema, la solución y los números. Un artículo nuevo cada semana.",
+    canonical: "https://www.inhumario.com/blog",
+    jsonld: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "Blog",
+      "name": "Blog de Inhumario",
+      "url": "https://www.inhumario.com/blog",
+      "description": "Casos reales de automatización para e-commerce y pymes.",
+    }),
+    content,
+  }));
+});
+
+app.get("/blog/:slug", (req, res, next) => {
+  const posts = loadPosts();
+  const post = posts.find((p) => p.slug === req.params.slug.toLowerCase());
+  if (!post) return res.redirect(302, "/blog");
+  const url = `https://www.inhumario.com/blog/${post.slug}`;
+
+  const content = `
+<section class="post-header dark" style="background:#111;">
+  <div class="wrap">
+    <div class="eyebrow reveal"><a href="/blog" style="color:inherit;">Blog</a> · ${escapeHtml(post.fecha)} · ${post.minutos} min</div>
+    <h1 class="reveal" style="font-size:clamp(30px,4.6vw,50px); color:#fff; max-width:20ch;">${escapeHtml(post.title)}</h1>
+    ${post.description ? `<p class="lead reveal">${escapeHtml(post.description)}</p>` : ""}
+  </div>
+</section>
+<article class="post-body-section">
+  <div class="wrap">
+    <div class="post-body">
+${post.html}
+    </div>
+    <div class="post-footer">
+      <p>¿Tienes un problema parecido en tu negocio?</p>
+      <a class="btn btn-dark" href="/#contacto">Cuéntamelo y te paso propuesta <span class="arr">→</span></a>
+      <p class="post-back"><a href="/blog">← Volver al blog</a></p>
+    </div>
+  </div>
+</article>`;
+
+  res.setHeader("Cache-Control", "no-cache, must-revalidate");
+  res.send(pageShell({
+    title: `${post.title} · Blog de Inhumario`,
+    description: post.description || post.title,
+    canonical: url,
+    ogImage: post.cover ? `https://www.inhumario.com${post.cover}` : undefined,
+    jsonld: JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      "headline": post.title,
+      "description": post.description,
+      "datePublished": post.date,
+      "url": url,
+      "image": post.cover ? `https://www.inhumario.com${post.cover}` : "https://www.inhumario.com/assets/logo.png",
+      "author": { "@type": "Person", "name": "Mario Cuadrado" },
+      "publisher": { "@type": "Organization", "name": "Inhumario", "url": "https://www.inhumario.com/" },
+    }),
+    content,
+  }));
+});
+
+// Sitemap dinámico: páginas fijas + artículos del blog
+app.get("/sitemap.xml", (req, res) => {
+  const fijas = [
+    { loc: "https://www.inhumario.com/", changefreq: "weekly", priority: "1.0" },
+    { loc: "https://www.inhumario.com/resenas", changefreq: "monthly", priority: "0.9" },
+    { loc: "https://www.inhumario.com/asistentes-virtuales", changefreq: "monthly", priority: "0.9" },
+    { loc: "https://www.inhumario.com/blog", changefreq: "weekly", priority: "0.9" },
+    { loc: "https://app.inhumario.com/", changefreq: "monthly", priority: "0.8" },
+  ];
+  const urls = fijas.map((u) => `  <url>
+    <loc>${u.loc}</loc>
+    <changefreq>${u.changefreq}</changefreq>
+    <priority>${u.priority}</priority>
+  </url>`);
+  for (const p of loadPosts()) {
+    urls.push(`  <url>
+    <loc>https://www.inhumario.com/blog/${escapeHtml(p.slug)}</loc>
+    <lastmod>${p.date}</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.7</priority>
+  </url>`);
+  }
+  res.type("application/xml");
+  res.setHeader("Cache-Control", "no-cache, must-revalidate");
+  res.send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>\n`);
+});
 
 // Landing de respuesta a reseñas con IA
 app.get(["/resenas", "/reseñas"], (req, res) => {
