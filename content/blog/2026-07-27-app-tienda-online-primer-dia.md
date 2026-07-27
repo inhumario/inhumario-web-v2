@@ -3,6 +3,7 @@ title: Lanzamos la app de nuestra tienda y el primer día hizo el 46 % de los pe
 description: El caso real del lanzamiento de la app móvil de Aromas de Té — el problema con el email marketing, cómo lo montamos y los números del día 1, hora a hora.
 date: 2026-07-27
 slug: app-tienda-online-primer-dia
+cover: /assets/app_blog_li.png
 ---
 
 Este no es un caso de un cliente. Es el nuestro. [Aromas de Té](https://www.aromasdete.com) es nuestra tienda online — activa desde 2014, con más de 17.000 clientes — y la usamos como banco de pruebas de todo lo que después ofrecemos a otros negocios. Lo que sigue es exactamente lo que pasó el día que lanzamos su app móvil.
