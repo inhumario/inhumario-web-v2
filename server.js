@@ -312,6 +312,10 @@ app.get(["/resenas", "/reseñas"], (req, res) => {
   res.sendFile(path.join(__dirname, "public", "resenas.html"));
 });
 
+app.get(["/asistentes-virtuales", "/asistentes"], (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "asistentes-virtuales.html"));
+});
+
 // Fallback SPA: cualquier ruta no encontrada → index.html
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "index.html"));
