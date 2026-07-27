@@ -307,6 +307,55 @@ app.get("/api/prefill/:token", (req, res) => {
   return res.json({ ok: true, empresa: v.empresa, email: v.email });
 });
 
+// Lead magnet: alta en Mautic (m.inhumario.com) vía submit del formulario.
+// El email con el enlace de la guía lo envía Mautic (campaña de bienvenida).
+const MAUTIC_BASE = process.env.MAUTIC_BASE || "https://m.inhumario.com";
+const MAUTIC_GUIA_FORM_ID = process.env.MAUTIC_GUIA_FORM_ID; // id del form "guia-automatizaciones"
+
+app.post("/api/guia", async (req, res) => {
+  const ip = (req.headers["x-forwarded-for"] || req.ip || "").split(",")[0].trim();
+  if (req.body.website && req.body.website.length > 0) {
+    return res.status(200).json({ ok: true }); // honeypot
+  }
+  if (!rateLimit(ip)) {
+    return res.status(429).json({ ok: false, error: "Demasiados envíos. Inténtalo más tarde." });
+  }
+  const email = clean(req.body.email, 200);
+  if (!isEmail(email)) {
+    return res.status(400).json({ ok: false, error: "Email no válido." });
+  }
+  if (!MAUTIC_GUIA_FORM_ID) {
+    console.error("[GUIA] MAUTIC_GUIA_FORM_ID no configurado");
+    return res.status(500).json({ ok: false, error: "Servicio no disponible." });
+  }
+  const origen = clean(req.body.origen, 60) || "blog";
+  try {
+    const body = new URLSearchParams();
+    body.set("mauticform[email]", email);
+    body.set("mauticform[origen]", origen);
+    body.set("mauticform[formId]", MAUTIC_GUIA_FORM_ID);
+    body.set("mauticform[return]", "");
+    body.set("mauticform[formName]", "guia_autom");
+    const r = await fetch(`${MAUTIC_BASE}/form/submit?formId=${MAUTIC_GUIA_FORM_ID}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "X-Forwarded-For": ip,
+      },
+      body: body.toString(),
+      redirect: "manual", // Mautic responde 302 al terminar
+    });
+    if (r.status >= 400) {
+      console.error("[GUIA] Mautic", r.status, (await r.text()).slice(0, 300));
+      return res.status(500).json({ ok: false, error: "No se pudo completar el alta. Inténtalo más tarde." });
+    }
+    return res.json({ ok: true });
+  } catch (err) {
+    console.error("[GUIA] error:", err.message);
+    return res.status(500).json({ ok: false, error: "No se pudo completar el alta. Inténtalo más tarde." });
+  }
+});
+
 app.get("/api/health", (req, res) => res.json({ ok: true, version: "1.0" }));
 
 // ============================================================
@@ -413,15 +462,16 @@ ${jsonld ? `<script type="application/ld+json">${jsonld}</script>` : ""}
 
 ${content}
 
-<section id="newsletter" style="background:#111; padding:56px 0;">
-  <div class="wrap" style="max-width:640px; text-align:center;">
-    <h2 style="color:#fff; font-size:1.5rem; margin:0 0 10px;">📬 Te contamos cómo automatizamos nuestra tienda</h2>
-    <p style="color:#B5B5B5; margin:0 0 22px;">Casos reales, sin humo y sin spam: un par de emails al mes.</p>
-    <form id="newsletter-form" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
+<section id="guia" style="background:#111; padding:60px 0;">
+  <div class="wrap" style="max-width:680px; text-align:center;">
+    <div class="eyebrow" style="color:#B5B5B5;">Guía gratuita</div>
+    <h2 style="color:#fff; font-size:1.6rem; margin:0 0 10px;">📘 Las automatizaciones que usamos en nuestra propia tienda</h2>
+    <p style="color:#B5B5B5; margin:0 0 22px;">Los casos de este blog, en una guía PDF con los números de cada uno — y a partir de ahí, un caso nuevo cada semana en tu email. Sin spam.</p>
+    <form id="guia-form" style="display:flex; gap:10px; justify-content:center; flex-wrap:wrap;">
       <input type="text" name="website" style="display:none" tabindex="-1" autocomplete="off">
       <input type="email" name="email" required placeholder="tu@email.com" style="flex:1 1 240px; max-width:320px; padding:12px 14px; border-radius:8px; border:1px solid #333; background:#1F1F1F; color:#fff; font-size:1rem;">
-      <button type="submit" style="padding:12px 22px; border-radius:8px; border:0; background:#FF8080; color:#111; font-weight:700; font-size:1rem; cursor:pointer;">Suscribirme</button>
-      <div id="newsletter-status" role="status" aria-live="polite" style="flex-basis:100%; color:#B5B5B5; margin-top:8px; min-height:1.2em;"></div>
+      <button type="submit" style="padding:12px 22px; border-radius:8px; border:0; background:#FF8080; color:#111; font-weight:700; font-size:1rem; cursor:pointer;">Quiero la guía</button>
+      <div id="guia-status" role="status" aria-live="polite" style="flex-basis:100%; color:#B5B5B5; margin-top:8px; min-height:1.2em;"></div>
     </form>
   </div>
 </section>
@@ -445,24 +495,24 @@ ${content}
 <script>
   document.getElementById('year').textContent = new Date().getFullYear();
 
-  const nlForm = document.getElementById('newsletter-form');
-  if (nlForm) {
-    nlForm.addEventListener('submit', async (e) => {
+  const gForm = document.getElementById('guia-form');
+  if (gForm) {
+    gForm.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const status = document.getElementById('newsletter-status');
-      const data = Object.fromEntries(new FormData(nlForm));
+      const status = document.getElementById('guia-status');
+      const data = Object.fromEntries(new FormData(gForm));
       data.origen = 'blog';
       status.textContent = 'Un momento…';
       try {
-        const r = await fetch('/api/newsletter', {
+        const r = await fetch('/api/guia', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),
         });
         const j = await r.json();
         if (j.ok) {
-          status.textContent = '✅ ¡Dentro! Te escribimos pronto.';
-          nlForm.querySelector('[name=email]').value = '';
+          status.textContent = '✅ ¡Hecho! Revisa tu email: la guía va de camino.';
+          gForm.querySelector('[name=email]').value = '';
         } else {
           status.textContent = j.error || 'No se pudo completar el alta.';
         }
