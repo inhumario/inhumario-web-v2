@@ -377,7 +377,7 @@
       e.preventDefault();
       const status = document.getElementById('newsletter-status');
       const data = Object.fromEntries(new FormData(nlForm));
-      data.origen = 'home';
+      data.origen = new URLSearchParams(location.search).get('de') || 'home';
       status.textContent = 'Un momento…';
       try {
         const r = await fetch('/api/guia', {

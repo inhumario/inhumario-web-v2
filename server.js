@@ -448,7 +448,7 @@ ${content}
       e.preventDefault();
       const status = document.getElementById('guia-status');
       const data = Object.fromEntries(new FormData(gForm));
-      data.origen = 'blog';
+      data.origen = new URLSearchParams(location.search).get('de') || 'blog';
       status.textContent = 'Un momento…';
       try {
         const r = await fetch('/api/guia', {
