@@ -39,11 +39,11 @@ Un cliente manda una nota de voz con su pedido. El sistema la transcribe, identi
 
 Lo que hace la persona: mirarlo y darle a un botón. Diez segundos.
 
-Fíjate en dónde ha caído la línea. La máquina ha hecho lo difícil de aguantar —entender un audio con ruido de fondo, acordarse de la tarifa de ese cliente— y ha parado justo antes de lo único que compromete a la empresa, que es confirmarle a alguien que su pedido está aceptado a ese precio.
+Fíjate en dónde ha caído la línea. La máquina ha hecho lo difícil de aguantar —[entender un audio con ruido de fondo](/blog/pedidos-por-audio-whatsapp-erp), acordarse de la tarifa de ese cliente— y ha parado justo antes de lo único que compromete a la empresa, que es confirmarle a alguien que su pedido está aceptado a ese precio.
 
 ### Reseñas de Google respondidas solas
 
-Todos los días se responden solas. Las de una estrella, no: **esas me esperan a mí.**
+Todos los días [se responden solas](/resenas). Las de una estrella, no: **esas me esperan a mí.**
 
 Ese matiz es toda la regla en una frase. Una reseña de cinco estrellas es un agradecimiento: no hay nada que decidir y no hay riesgo en que lo escriba una máquina. Una reseña de una estrella es un cliente enfadado en un sitio público — ahí hay una decisión de negocio (¿nos disculpamos?, ¿le devolvemos el dinero?, ¿tenía razón?) y esa decisión no es automatizable ni queriendo.
 

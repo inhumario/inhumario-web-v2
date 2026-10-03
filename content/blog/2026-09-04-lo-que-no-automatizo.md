@@ -44,6 +44,6 @@ Con esa misma regla aplicada, esto es lo que sí corre solo en mi negocio hoy:
   <div class="stat"><div class="big">1</div><div class="lbl">correo a las siete de la mañana con lo raro del día. Si no hay nada raro, lo dice en una línea</div></div>
 </div>
 
-Fíjate en que las tres tienen la misma forma: **la máquina prepara, la persona confirma**. Ninguna de las tres decide nada que haya que explicar después.
+Fíjate en que las tres tienen la misma forma: [**la máquina prepara, la persona confirma**](/blog/la-maquina-prepara-la-persona-confirma). Ninguna de las tres decide nada que haya que explicar después.
 
 Automatizar el montaje te devuelve el tiempo. Automatizar la decisión te quita el negocio. Toda la diferencia entre las dos cosas cabe en las tres preguntas de arriba, y se pueden contestar hoy mismo con una tarea tuya, sin comprar nada.

@@ -20,7 +20,7 @@ Las tres que deshice eran de ese tipo.
 
 ## 1. Contestar a clientes enfadados
 
-**Qué monté.** El sistema que me responde las reseñas ya llevaba miles de respuestas publicadas sin que yo escribiera ninguna. El siguiente paso parecía obvio: que contestara también los correos de clientes con un problema. Tono de la marca, disculpa, solución propuesta, todo redactado en segundos.
+**Qué monté.** [El sistema que me responde las reseñas](/resenas) ya llevaba miles de respuestas publicadas sin que yo escribiera ninguna. El siguiente paso parecía obvio: que contestara también los correos de clientes con un problema. Tono de la marca, disculpa, solución propuesta, todo redactado en segundos.
 
 **Qué pasó.** Salía correcto. Y salía frío. Un cliente enfadado no se calma con un texto correcto; se calma cuando nota que al otro lado hay alguien que sabe qué le prometió y qué le va a cumplir. Y eso no está en los datos del pedido. Las respuestas automáticas cerraban la incidencia y no recuperaban a la persona: el ticket quedaba resuelto y el cliente no volvía.
 

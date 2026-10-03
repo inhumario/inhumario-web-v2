@@ -38,7 +38,7 @@ Ventas, gasto en publicidad y lo que ha devuelto. Tres números, no veinte. Son 
 
 ### 2. Lo que se ha roto
 
-Productos sin stock, envíos con incidencia, facturas de proveedor que faltan. **Esta es la parte que de verdad justifica el correo**, porque es lo que cuesta dinero mientras no lo sabes. Un producto agotado que nadie ha visto no aparece en ninguna gráfica de ventas: aparece como una venta que no ocurrió, y esa no la ves nunca.
+Productos sin stock, envíos con incidencia, facturas de proveedor que faltan. **Esta es la parte que de verdad justifica el correo**, porque es lo que cuesta dinero mientras no lo sabes. [Un producto agotado que nadie ha visto](/blog/seis-dias-agotado-ni-una-queja) no aparece en ninguna gráfica de ventas: aparece como una venta que no ocurrió, y esa no la ves nunca.
 
 De aquí salió una de las cosas que más me sorprendieron: el correo también avisa de la factura que **no** ha llegado y debería haber llegado. El mes que un proveedor no emitió la suya me enteré por el correo de la mañana, no en el cierre contable seis semanas después.
 

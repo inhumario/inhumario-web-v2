@@ -69,4 +69,4 @@ Si tienes algo funcionando solo — una tarea programada, una integración, un i
 2. **¿Lo que vigilas es que no haya errores, o que sí haya resultado?** Solo la segunda pregunta detecta las cosas que no llegan a ejecutarse.
 3. **¿Alguna de sus piezas tiene fecha de caducidad?** Apúntala hoy en el calendario, con diez días de aviso. Es lo único de esta lista que se arregla en un minuto.
 
-No hace falta montar nada sofisticado. La mayoría de estos avisos son un correo condicional que alguien lee de verdad. Lo caro nunca es vigilar: es la semana que tardaste en enterarte.
+No hace falta montar nada sofisticado. La mayoría de estos avisos son un correo condicional que alguien lee de verdad. Lo caro nunca es vigilar: es la semana que tardaste en enterarte (a mí me pasó con [un producto seis días agotado](/blog/seis-dias-agotado-ni-una-queja)).

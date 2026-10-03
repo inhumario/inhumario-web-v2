@@ -44,7 +44,7 @@ Es la parte que más impaciencia da y la que más disgustos ahorra. Yo mismo la 
 
 ## Los números: lo que cuesta de tu tiempo
 
-Esta es la parte que nadie te dice y la que de verdad quieres saber:
+Esta es la parte que nadie te dice y la que de verdad quieres saber (el dinero lo conté en [lo que cuesta de verdad una automatización](/blog/lo-que-cuesta-una-automatizacion)):
 
 <div class="stats-grid">
   <div class="stat"><div class="big">2-3 h</div><div class="lbl">tuyas la primera semana, contando cómo trabajáis</div></div>

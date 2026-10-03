@@ -24,7 +24,7 @@ Hay una segunda trampa: creemos que hacer esas tareas a mano es más seguro. No 
 
 **Antes**: me sentaba por la noche a responder reseñas de clientes. Aguantas cuarenta y lo dejas. Las que peor sientan — las de una estrella — son las que más se quedan sin respuesta, porque son las que más cuesta escribir.
 
-**Ahora**: se responden solas todos los días, con el tono de la marca y mirando el contenido real de cada reseña. Las delicadas esperan a que yo las lea.
+**Ahora**: [se responden solas todos los días](/resenas), con el tono de la marca y mirando el contenido real de cada reseña. Las delicadas esperan a que yo las lea.
 
 <div class="stats-grid">
   <div class="stat"><div class="big">10.900</div><div class="lbl">reseñas respondidas</div></div>
@@ -59,7 +59,7 @@ Hay una segunda trampa: creemos que hacer esas tareas a mano es más seguro. No 
 
 **Antes**: cuatro o cinco sitios distintos donde mirar cómo iba la cosa — ventas, stock, publicidad, envíos. Entrar en cada uno, interpretarlo, comparar con ayer. Y cuando andas liado, no entras: te enteras de que algo va mal una semana tarde.
 
-**Ahora**: cada mañana recibo un correo con lo que pasó ayer, ya interpretado: ventas, gasto en publicidad y su retorno, productos que se han quedado sin stock, incidencias de envío. No abro ningún panel. Si algo se sale de lo normal, el correo me lo dice con nombre y apellidos.
+**Ahora**: cada mañana recibo [un correo con lo que pasó ayer](/blog/el-correo-de-las-siete), ya interpretado: ventas, gasto en publicidad y su retorno, productos que se han quedado sin stock, incidencias de envío. No abro ningún panel. Si algo se sale de lo normal, el correo me lo dice con nombre y apellidos.
 
 ### 6. Reescribir fichas de producto una a una
 

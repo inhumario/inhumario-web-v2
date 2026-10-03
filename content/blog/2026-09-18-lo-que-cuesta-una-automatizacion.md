@@ -34,7 +34,7 @@ Este es el reparto aproximado de los proyectos que he montado, míos y de client
 
 La mitad del trabajo es entender. No programar: entender. Sentarse con quien hace hoy la tarea y preguntarle «¿y si llega uno sin número de pedido?» hasta que se acaben los «y si».
 
-Los primeros días de rodaje se comprueba todo a mano en paralelo, aunque parezca tirar el tiempo. Es exactamente al revés: es lo que hace que el mes dos puedas dejar de mirar. Cuando el sistema que contesta las reseñas de mi tienda empezó a funcionar, estuve **tres semanas leyendo todas las respuestas antes de que salieran**. Ahora llevo miles publicadas sin leer ninguna. Esas tres semanas son parte del precio.
+[Los primeros días de rodaje](/blog/las-dos-semanas-siguientes-a-decir-que-si) se comprueba todo a mano en paralelo, aunque parezca tirar el tiempo. Es exactamente al revés: es lo que hace que el mes dos puedas dejar de mirar. Cuando [el sistema que contesta las reseñas](/resenas) de mi tienda empezó a funcionar, estuve **tres semanas leyendo todas las respuestas antes de que salieran**. Ahora llevo miles publicadas sin leer ninguna. Esas tres semanas son parte del precio.
 
 Y las excepciones de verdad solo aparecen cuando ya está funcionando. No hay forma de adivinarlas en una reunión. Por eso un proyecto que se entrega y se cierra el mismo día es un proyecto que te van a devolver.
 

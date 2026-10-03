@@ -32,7 +32,7 @@ Lo que sí funciona es al revés: que el dato venga a buscarte a ti. En mi caso 
 - **Envíos**: cada expedición tiene un tiempo normal según destino y transportista. Si un paquete pasa de 48 horas sin un solo movimiento nuevo, queda señalado. No hace falta saber qué le ha pasado: basta con saber que ha dejado de moverse.
 - **Facturas**: se vigila al proveedor, no al documento. Si uno que factura todos los meses lleva dos semanas sin mandar nada, eso es la anomalía. La ausencia es el dato.
 
-La regla común a las tres es la misma que aplico a todo lo que automatizo: **la máquina prepara, la persona confirma.** Ninguna de ellas compra, reclama ni escribe a nadie. Solo levantan la mano.
+La regla común a las tres es la misma que aplico a todo lo que automatizo: [**la máquina prepara, la persona confirma.**](/blog/la-maquina-prepara-la-persona-confirma) Ninguna de ellas compra, reclama ni escribe a nadie. Solo levantan la mano.
 
 Y hay una segunda regla, tan importante como la primera: **solo entra en el correo lo anómalo**. Si hoy no hay nada raro, el correo se lee en treinta segundos y dice que no hay nada raro. Un aviso que salta todos los días deja de ser un aviso a la semana siguiente.
 

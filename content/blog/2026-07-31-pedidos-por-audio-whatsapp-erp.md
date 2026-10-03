@@ -52,6 +52,6 @@ Si tus clientes te piden por WhatsApp, por teléfono o por email y alguien de tu
 1. **No cambies al cliente, cambia el sistema.** El canal por el que te piden es el que a ellos les funciona. Lo que hay que automatizar es lo que pasa después.
 2. **El historial es el diccionario.** La mayor parte de la ambigüedad de un pedido ("lo de siempre") se resuelve sola en cuanto el sistema puede mirar lo que ese cliente compró antes.
 3. **La excepción de cada cliente va en el sistema, no en la cabeza de nadie.** Tarifas, descuentos, almacenes: si están en el dato, se aplican siempre; si están en la memoria de una persona, fallan el día que esa persona libra.
-4. **Automatiza el montaje, no la decisión.** El pedido se monta solo; confirmarlo sigue siendo humano. Ese reparto es el que hace que puedas fiarte.
+4. **Automatiza el montaje, no la decisión.** El pedido se monta solo; confirmarlo sigue siendo humano: [la máquina prepara, la persona confirma](/blog/la-maquina-prepara-la-persona-confirma). Ese reparto es el que hace que puedas fiarte.
 
 Lo montamos para nuestra propia tienda y funciona a diario. Si quieres verlo aplicado a tus pedidos y a tu ERP, escríbeme por [WhatsApp](https://wa.me/34650012448) y lo miramos — la primera conversación es gratis.

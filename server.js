@@ -4,6 +4,7 @@ const fs = require("fs");
 const nodemailer = require("nodemailer");
 const crypto = require("crypto"); // node:crypto — el `crypto` global es Web Crypto y no trae randomBytes
 const { marked } = require("marked");
+const compression = require("compression");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -59,6 +60,31 @@ setInterval(() => {
 // Middlewares
 // ============================================================
 app.set("trust proxy", true);
+app.use(compression());
+
+// ============================================================
+// SEO: una sola URL por página — host canónico (www), sin barra final y sin alias.
+// Antes respondían 200 inhumario.com y www.inhumario.com y Google indexaba las dos.
+// ============================================================
+const CANONICAL_HOST = "www.inhumario.com";
+const ALIAS = { "/reseñas": "/resenas", "/asistentes": "/asistentes-virtuales" };
+app.use((req, res, next) => {
+  if (req.method !== "GET" && req.method !== "HEAD") return next();
+  const p = req.path;
+  // Assets, nav.js, API y descargas se sirven en los dos hosts: los cargan otros
+  // dominios con fetch/CORS y una redirección sin cabeceras CORS los rompería.
+  if (p.startsWith("/assets/") || p.startsWith("/api/") || p.startsWith("/descargas/") || p === "/nav.js") return next();
+  let target = p;
+  try { target = decodeURIComponent(p); } catch { /* ruta mal codificada: se queda como viene */ }
+  if (target.length > 1 && target.endsWith("/")) target = target.replace(/\/+$/, "") || "/";
+  if (ALIAS[target]) target = ALIAS[target];
+  const changed = target !== p && encodeURI(target) !== p;
+  const wrongHost = req.hostname === "inhumario.com";
+  if (!wrongHost && !changed) return next();
+  const i = req.originalUrl.indexOf("?");
+  const qs = i === -1 ? "" : req.originalUrl.slice(i);
+  res.redirect(301, (wrongHost ? `https://${CANONICAL_HOST}` : "") + encodeURI(target) + qs);
+});
 app.use(express.json({ limit: "20kb" }));
 app.use(express.urlencoded({ extended: false, limit: "20kb" }));
 
@@ -367,6 +393,8 @@ function loadPosts() {
         minutos,
         title: meta.title,
         description: meta.description || "",
+        metaDescription: meta.meta_description || "",
+        updated: /^\d{4}-\d{2}-\d{2}$/.test(meta.updated || "") ? meta.updated : "",
         cover: meta.cover || "",
         html: marked.parse(body),
       });
@@ -379,7 +407,32 @@ function loadPosts() {
   return posts;
 }
 
-function pageShell({ title, description, canonical, ogImage, jsonld, content }) {
+// Meta description: Google corta hacia los 155-160 caracteres. La entradilla del
+// artículo puede ser larga; para la etiqueta se recorta en un límite de frase o palabra.
+function metaDesc(s, max = 158) {
+  s = String(s || "").replace(/\s+/g, " ").trim();
+  if (s.length <= max) return s;
+  const cut = s.slice(0, max - 1);
+  const frase = Math.max(cut.lastIndexOf(". "), cut.lastIndexOf("? "));
+  if (frase > 110) return cut.slice(0, frase + 1);
+  return cut.slice(0, cut.lastIndexOf(" ")).replace(/[,;:—–-]+$/, "").trim() + "…";
+}
+
+// JSON-LD seguro para incrustar en <script>
+function ld(obj) {
+  return JSON.stringify(obj).replace(/</g, "\\u003c");
+}
+
+const OG_DEFAULT = "https://www.inhumario.com/assets/og-blog.png";
+const PUBLISHER = {
+  "@type": "Organization",
+  "name": "Inhumario",
+  "url": "https://www.inhumario.com/",
+  "logo": { "@type": "ImageObject", "url": "https://www.inhumario.com/assets/icon-square-512.png" },
+};
+
+function pageShell({ title, description, canonical, ogImage, ogType, robots, extraHead, jsonld, content }) {
+  const desc = metaDesc(description);
   return `<!DOCTYPE html>
 <html lang="es">
 <head>
@@ -387,17 +440,21 @@ function pageShell({ title, description, canonical, ogImage, jsonld, content }) 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#111111">
 <title>${escapeHtml(title)}</title>
-<meta name="description" content="${escapeHtml(description)}">
+<meta name="description" content="${escapeHtml(desc)}">
+${robots ? `<meta name="robots" content="${escapeHtml(robots)}">` : ""}
+<meta property="og:site_name" content="Inhumario">
 <meta property="og:title" content="${escapeHtml(title)}">
-<meta property="og:description" content="${escapeHtml(description)}">
-<meta property="og:type" content="article">
-<meta property="og:url" content="${escapeHtml(canonical)}">
-<meta property="og:image" content="${escapeHtml(ogImage || "https://www.inhumario.com/assets/logo.png")}">
+<meta property="og:description" content="${escapeHtml(desc)}">
+<meta property="og:type" content="${escapeHtml(ogType || "website")}">
+${canonical ? `<meta property="og:url" content="${escapeHtml(canonical)}">` : ""}
+<meta property="og:image" content="${escapeHtml(ogImage || OG_DEFAULT)}">
 <meta property="og:locale" content="es_ES">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="${escapeHtml(title)}">
-<meta name="twitter:description" content="${escapeHtml(description)}">
-<link rel="canonical" href="${escapeHtml(canonical)}">
+<meta name="twitter:description" content="${escapeHtml(desc)}">
+<meta name="twitter:image" content="${escapeHtml(ogImage || OG_DEFAULT)}">
+${extraHead || ""}
+${canonical ? `<link rel="canonical" href="${escapeHtml(canonical)}">` : ""}
 <link rel="icon" type="image/png" href="/assets/logo.png">
 <link rel="stylesheet" href="/styles.css?v=6">
 ${jsonld ? `<script type="application/ld+json">${jsonld}</script>` : ""}
@@ -430,9 +487,17 @@ ${content}
     <p>© <span id="year"></span> Inhumario · Mario Cuadrado · Sonseca, Toledo</p>
     <p class="tagline">Automatizaciones que trabajan por tí</p>
     <p class="footer-links">
+      <a href="/">Inicio</a>
+      <span>·</span>
       <a href="/blog">Blog</a>
       <span>·</span>
-      <a href="https://app.inhumario.com" target="_blank" rel="noopener">App móvil para tu tienda</a>
+      <a href="/resenas">Respuesta a reseñas con IA</a>
+      <span>·</span>
+      <a href="/asistentes-virtuales">Para asistentes virtuales</a>
+      <span>·</span>
+      <a href="https://app.inhumario.com">App móvil para tu tienda</a>
+      <span>·</span>
+      <a href="https://facturas.inhumario.com">Inhumario Facturas</a>
       <span>·</span>
       <a href="https://www.aromasdete.com" target="_blank" rel="noopener">Aromas de Té</a>
     </p>
@@ -515,12 +580,19 @@ app.get("/blog", (req, res) => {
     title: "Blog · Inhumario — Casos reales de automatización",
     description: "Casos reales de automatización para e-commerce y pymes: el problema, la solución y los números. Un artículo nuevo cada semana.",
     canonical: "https://www.inhumario.com/blog",
-    jsonld: JSON.stringify({
+    jsonld: ld({
       "@context": "https://schema.org",
       "@type": "Blog",
       "name": "Blog de Inhumario",
       "url": "https://www.inhumario.com/blog",
       "description": "Casos reales de automatización para e-commerce y pymes.",
+      "publisher": PUBLISHER,
+      "blogPost": posts.slice(0, 20).map((p) => ({
+        "@type": "BlogPosting",
+        "headline": p.title,
+        "url": `https://www.inhumario.com/blog/${p.slug}`,
+        "datePublished": p.date,
+      })),
     }),
     content,
   }));
@@ -529,8 +601,34 @@ app.get("/blog", (req, res) => {
 app.get("/blog/:slug", (req, res, next) => {
   const posts = loadPosts();
   const post = posts.find((p) => p.slug === req.params.slug.toLowerCase());
-  if (!post) return res.redirect(302, "/blog");
+  if (!post) {
+    // El nombre del fichero lleva fecha y el slug público no: si alguien enlaza
+    // /blog/YYYY-MM-DD-slug se le lleva al bueno. Lo demás es un 404 de verdad.
+    const slug = req.params.slug.toLowerCase();
+    const sinFecha = slug.replace(/^\d{4}-\d{2}-\d{2}-/, "");
+    if (sinFecha !== slug && posts.some((p) => p.slug === sinFecha)) return res.redirect(301, `/blog/${sinFecha}`);
+    return next();
+  }
   const url = `https://www.inhumario.com/blog/${post.slug}`;
+
+  // «Sigue leyendo»: los tres artículos siguientes en antigüedad (dando la vuelta)
+  const idx = posts.indexOf(post);
+  const otros = [];
+  for (let k = 1; k < posts.length && otros.length < 3; k++) otros.push(posts[(idx + k) % posts.length]);
+  const relacionados = otros.length ? `
+<section style="padding:0 0 80px;">
+  <div class="wrap">
+    <div class="eyebrow">Sigue leyendo</div>
+    <div class="blog-list" style="margin-top:22px;">
+${otros.map((p) => `      <a class="blog-card" href="/blog/${escapeHtml(p.slug)}">
+        <div class="blog-card-meta">${escapeHtml(p.fecha)} · ${p.minutos} min de lectura</div>
+        <h2>${escapeHtml(p.title)}</h2>
+        <span class="solution-cta">Leer artículo <span class="arr">→</span></span>
+      </a>`).join("\n")}
+    </div>
+  </div>
+</section>` : "";
+  const cover = post.cover ? `https://www.inhumario.com${post.cover}` : OG_DEFAULT;
 
   const content = `
 <section class="post-header dark" style="background:#111;">
@@ -551,24 +649,41 @@ ${post.html}
       <p class="post-back"><a href="/blog">← Volver al blog</a></p>
     </div>
   </div>
-</article>`;
+</article>${relacionados}`;
 
   res.setHeader("Cache-Control", "no-cache, must-revalidate");
   res.send(pageShell({
-    title: `${post.title} · Blog de Inhumario`,
-    description: post.description || post.title,
+    title: `${post.title} · Inhumario`,
+    description: post.metaDescription || post.description || post.title,
     canonical: url,
-    ogImage: post.cover ? `https://www.inhumario.com${post.cover}` : undefined,
-    jsonld: JSON.stringify({
+    ogImage: cover,
+    ogType: "article",
+    extraHead: `<meta property="article:published_time" content="${post.date}">\n<meta property="article:author" content="Mario Cuadrado">`,
+    jsonld: ld({
       "@context": "https://schema.org",
-      "@type": "BlogPosting",
-      "headline": post.title,
-      "description": post.description,
-      "datePublished": post.date,
-      "url": url,
-      "image": post.cover ? `https://www.inhumario.com${post.cover}` : "https://www.inhumario.com/assets/logo.png",
-      "author": { "@type": "Person", "name": "Mario Cuadrado" },
-      "publisher": { "@type": "Organization", "name": "Inhumario", "url": "https://www.inhumario.com/" },
+      "@graph": [
+        {
+          "@type": "BlogPosting",
+          "headline": post.title,
+          "description": metaDesc(post.metaDescription || post.description),
+          "datePublished": post.date,
+          "dateModified": post.updated || post.date,
+          "inLanguage": "es",
+          "url": url,
+          "mainEntityOfPage": url,
+          "image": cover,
+          "author": { "@type": "Person", "name": "Mario Cuadrado", "url": "https://www.inhumario.com/#mario", "jobTitle": "Fundador de Inhumario" },
+          "publisher": PUBLISHER,
+        },
+        {
+          "@type": "BreadcrumbList",
+          "itemListElement": [
+            { "@type": "ListItem", "position": 1, "name": "Inhumario", "item": "https://www.inhumario.com/" },
+            { "@type": "ListItem", "position": 2, "name": "Blog", "item": "https://www.inhumario.com/blog" },
+            { "@type": "ListItem", "position": 3, "name": post.title, "item": url },
+          ],
+        },
+      ],
     }),
     content,
   }));
@@ -581,7 +696,6 @@ app.get("/sitemap.xml", (req, res) => {
     { loc: "https://www.inhumario.com/resenas", changefreq: "monthly", priority: "0.9" },
     { loc: "https://www.inhumario.com/asistentes-virtuales", changefreq: "monthly", priority: "0.9" },
     { loc: "https://www.inhumario.com/blog", changefreq: "weekly", priority: "0.9" },
-    { loc: "https://app.inhumario.com/", changefreq: "monthly", priority: "0.8" },
   ];
   const urls = fijas.map((u) => `  <url>
     <loc>${u.loc}</loc>
@@ -591,7 +705,7 @@ app.get("/sitemap.xml", (req, res) => {
   for (const p of loadPosts()) {
     urls.push(`  <url>
     <loc>https://www.inhumario.com/blog/${escapeHtml(p.slug)}</loc>
-    <lastmod>${p.date}</lastmod>
+    <lastmod>${p.updated || p.date}</lastmod>
     <changefreq>yearly</changefreq>
     <priority>0.7</priority>
   </url>`);
@@ -601,18 +715,45 @@ app.get("/sitemap.xml", (req, res) => {
   res.send(`<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>\n`);
 });
 
-// Landing de respuesta a reseñas con IA
-app.get(["/resenas", "/reseñas"], (req, res) => {
+// Landing de respuesta a reseñas con IA (/reseñas redirige aquí desde el middleware SEO)
+app.get("/resenas", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "resenas.html"));
 });
 
-app.get(["/asistentes-virtuales", "/asistentes"], (req, res) => {
+// /asistentes redirige aquí desde el middleware SEO
+app.get("/asistentes-virtuales", (req, res) => {
   res.sendFile(path.join(__dirname, "public", "asistentes-virtuales.html"));
 });
 
-// Fallback SPA: cualquier ruta no encontrada → index.html
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+// 404 real. Antes cualquier URL inventada devolvía la home con 200 (soft 404):
+// Google lo trata como contenido duplicado y los checks de despliegue no distinguían.
+app.use((req, res) => {
+  res.status(404);
+  if (req.method !== "GET" || /\.[a-z0-9]{2,5}$/i.test(req.path)) return res.type("txt").send("404 — no encontrado");
+  const content = `
+<section class="blog-hero dark" style="background:#111;">
+  <div class="wrap">
+    <div class="eyebrow">Error 404</div>
+    <h1 style="font-size:clamp(34px,5vw,56px); color:#fff;">Esta página no existe.</h1>
+    <p class="lead">Puede que el enlace esté mal escrito o que la página se haya movido.</p>
+  </div>
+</section>
+<section style="padding:70px 0;">
+  <div class="wrap">
+    <div class="blog-list">
+      <a class="blog-card" href="/"><h2>Ir al inicio</h2><p>Qué hago por tu negocio: apps, automatizaciones e IA.</p><span class="solution-cta">Inicio <span class="arr">→</span></span></a>
+      <a class="blog-card" href="/blog"><h2>Blog</h2><p>Casos reales de automatización, con números.</p><span class="solution-cta">Leer el blog <span class="arr">→</span></span></a>
+      <a class="blog-card" href="/resenas"><h2>Respuesta a reseñas con IA</h2><p>La app que responde tus reseñas de Google y Trusted Shops en tu tono.</p><span class="solution-cta">Ver cómo funciona <span class="arr">→</span></span></a>
+    </div>
+  </div>
+</section>`;
+  res.setHeader("Cache-Control", "no-cache, must-revalidate");
+  res.send(pageShell({
+    title: "Página no encontrada · Inhumario",
+    description: "La página que buscas no existe en inhumario.com.",
+    robots: "noindex",
+    content,
+  }));
 });
 
 app.listen(PORT, () => {
