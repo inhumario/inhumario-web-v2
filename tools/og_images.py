@@ -57,4 +57,5 @@ if __name__ == "__main__":
     og(A / "og-blog.png", "Blog", "Casos reales\nde automatización.")
     # Portadas de las piezas mensuales con intención de búsqueda (una línea por artículo)
     og(A / "og-como-responder-resenas-google.png", "Guía práctica", "Cómo responder\na las reseñas\nde Google.")
+    og(A / "og-eliminar-una-resena-de-google.png", "Guía práctica", "Cómo eliminar\nuna reseña\nde Google.")
     print("ok")
